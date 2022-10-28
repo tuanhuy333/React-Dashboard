@@ -22,6 +22,18 @@ export const links = [
         name: 'orders',
         icon: <AiOutlineShoppingCart />,
       },
+      {
+        name: 'Item 1',
+        icon: <AiOutlineShoppingCart />,
+      },
+      {
+        name: 'Item 2',
+        icon: <AiOutlineShoppingCart />,
+      },
+      {
+        name: 'Item 3',
+        icon: <AiOutlineShoppingCart />,
+      },
     ],
   },
  
