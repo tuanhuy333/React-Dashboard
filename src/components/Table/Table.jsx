@@ -1,108 +1,18 @@
-import React, { useState, useMemo } from 'react'
-import { useTable, useFilters, useSortBy, usePagination } from 'react-table';
-import '../assets/table-style.css';
+import React, { useState } from 'react'
+import { useTable, useFilters, useGlobalFilter, useSortBy, usePagination } from 'react-table';
+import { GlobalFilter, DefaultFilterForColumn } from "./Filter";
 
-const Status = ({ value }) => {
-    return (
-        <>
-            {value === 0 ?
+import '../../assets/table-style.css';
 
-                (<span className="status-success">
-                    Success
-                </span>
-                )
-                : (<span className="status-failed">
-                    Failed
-                </span>
-                )
-            }
-        </>
-    );
-};
+const OrderTable = ({ columns, data }) => {
 
-function Table({ data }) {
 
-    const columns = useMemo(
-        () => [
-
-            {
-                Header: "Order No",
-                accessor: "orderNo"
-            },
-            {
-                Header: "Merchant",
-                accessor: "merchantID"
-            },
-            {
-                Header: "App ID",
-                accessor: "appID"
-            },
-            {
-                id: "amount",
-                Header: "Amount",
-                accessor: "amount"
-            },
-            {
-                Header: "Status",
-                accessor: "status",
-                Cell: ({ cell: { value } }) => <Status value={value} />
-            },
-            {
-                Header: "Product Code",
-                accessor: "productCode"
-            },
-            {
-                Header: "Description",
-                accessor: "description"
-            },
-            {
-                Header: "Create time",
-                accessor: "CreateTime"
-            },
-
-            // {
-            //     Header: "Type",
-            //     accessor: "show.type"
-            // }
-
-            // ,
-            // {
-            //     Header: "Language",
-            //     accessor: "show.language"
-            // },
-            // {
-            //     Header: "Genre(s)",
-            //     accessor: "show.genres",
-            //     Cell: ({ cell: { value } }) => <Genres values={value} />
-            // },
-            // {
-            //     Header: "Runtime",
-            //     accessor: "show.runtime",
-            //     Cell: ({ cell: { value } }) => {
-            //         const hour = Math.floor(value / 60);
-            //         const min = Math.floor(value % 60);
-            //         return (
-            //             <>
-            //                 {hour > 0 ? `${hour} hr${hour > 1 ? "s" : ""} ` : ""}
-            //                 {min > 0 ? `${min} min${min > 1 ? "s" : ""}` : ""}
-            //             </>
-            //         );
-            //     }
-            // },
-            // {
-            //     Header: "Status",
-            //     accessor: "show.status"
-            // }
-
-        ],
-        []
-    );
-
+    // State
     const [filterInput, setFilterInput] = useState("");
+
+
     // Use the state and functions returned from useTable to build your UI
     const {
-
-
         getTableProps,
         getTableBodyProps,
         setFilter,
@@ -114,20 +24,23 @@ function Table({ data }) {
         canNextPage,
         pageOptions,
         state,
+        visibleColumns,
         gotoPage,
         pageCount,
         setPageSize,
-        prepareRow
+        prepareRow,
+        setGlobalFilter,
+        preGlobalFilteredRows,
 
 
     } = useTable(
         {
             columns,
             data,
-            //initialState: { pageIndex: 0 }
-
+            defaultColumn: { Filter: DefaultFilterForColumn },
         },
         useFilters,
+        useGlobalFilter,
         useSortBy,
         usePagination
     );
@@ -150,8 +63,24 @@ function Table({ data }) {
                 onChange={handleFilterChange}
                 placeholder={"Search Merchant"}
             />
+
             <table {...getTableProps()}>
                 <thead>
+                    <tr>
+                        <th
+                            colSpan={visibleColumns.length}
+                            style={{
+                                textAlign: "center",
+                            }}
+                        >
+                            {/* rendering global filter */}
+                            <GlobalFilter
+                                preGlobalFilteredRows={preGlobalFilteredRows}
+                                globalFilter={state.globalFilter}
+                                setGlobalFilter={setGlobalFilter}
+                            />
+                        </th>
+                    </tr>
                     {headerGroups.map(headerGroup => (
                         <tr {...headerGroup.getHeaderGroupProps()}>
                             {headerGroup.headers.map(column => (
@@ -166,6 +95,8 @@ function Table({ data }) {
                                     }
                                 >
                                     {column.render("Header")}
+                                    {/* Render the columns filter UI */}
+                                    <div>{column.canFilter ? column.render("Filter") : null}</div>
                                 </th>
                             ))}
                         </tr>
@@ -233,7 +164,9 @@ function Table({ data }) {
                 </select>
             </div>
         </>
+
+
     );
 }
 
-export default Table
+export default OrderTable;
