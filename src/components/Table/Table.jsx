@@ -58,11 +58,6 @@ const OrderTable = ({ columns, data }) => {
     // Render the UI for your table
     return (
         <>
-            <input
-                value={filterInput}
-                onChange={handleFilterChange}
-                placeholder={"Search Merchant"}
-            />
 
             <table {...getTableProps()}>
                 <thead>
